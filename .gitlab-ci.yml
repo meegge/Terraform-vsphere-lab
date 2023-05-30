@@ -1,0 +1,21 @@
+include:
+ # To fetch the latest template, use:
+  - template: Terraform.latest.gitlab-ci.yml
+variables:
+ TF_STATE_NAME: vsphere_lab
+ TF_CACHE_KEY: vsphere_lab
+ # If your terraform files are in a subdirectory, set TF_ROOT accordingly. For example:
+ # TF_ROOT: terraform/production
+deploy:
+  stage: deploy
+  script:
+  - cd "${TF_ROOT}"
+  - gitlab-terraform apply
+  resource_group: "${TF_STATE_NAME}"
+  rules:
+  - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+  extends: ".terraform:deploy"
+  dependencies:
+  - build
+  environment:
+    name: "$TF_STATE_NAME"
